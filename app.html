@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="nl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CtrlSync CRM</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ══════════════════════════════════
+   APP LAYOUT
+══════════════════════════════════ */
+.app { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-head {
+  padding: 18px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.workspace-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+}
+.workspace-btn:hover { background: var(--bg3); }
+
+.ws-icon {
+  width: 30px; height: 30px;
+  background: var(--text);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ws-icon svg { width: 15px; height: 15px; }
+.ws-name { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+.ws-plan { font-size: 11px; color: var(--text3); }
+.ws-chevron { margin-left: auto; color: var(--text3); }
+
+.sidebar-nav { padding: 10px 10px; flex: 1; }
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  padding: 14px 8px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  color: var(--text2);
+  font-size: 13.5px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.12s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  position: relative;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--bg3); color: var(--text); font-weight: 500; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 2px; background: var(--text); border-radius: 99px; }
+.nav-item-icon { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.6; }
+.nav-item.active .nav-item-icon { opacity: 1; }
+.nav-badge { margin-left: auto; background: var(--text); color: var(--bg); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 99px; min-width: 18px; text-align: center; }
+.nav-badge-amber { background: var(--amber-bg); color: var(--amber); }
+
+.sidebar-footer {
+  padding: 12px 10px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.user-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+}
+.user-btn:hover { background: var(--bg3); }
+
+.user-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--violet-bg), var(--blue-bg));
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--violet);
+  flex-shrink: 0;
+}
+.user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.user-email { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+
+/* MAIN */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* TOPBAR */
+.topbar {
+  height: var(--topbar-h);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  gap: 12px;
+}
+
+.topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+.hamburger {
+  display: none;
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.page-heading {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.icon-btn {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.icon-btn:hover { background: var(--bg4); color: var(--text); }
+.icon-btn-badge {
+  position: absolute;
+  top: -3px; right: -3px;
+  width: 14px; height: 14px;
+  background: var(--red);
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--bg);
+}
+
+/* CONTENT */
+.content { padding: 24px; flex: 1; max-width: 1400px; width: 100%; }
+
+/* METRICS GRID */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+  cursor: pointer;
+}
+.metric-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+
+.metric-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+.metric-value { font-family: var(--font-serif); font-size: 30px; color: var(--text); line-height: 1; letter-spacing: -0.03em; }
+.metric-value-sm { font-size: 22px; }
+.metric-sub { font-size: 12px; color: var(--text3); margin-top: 5px; }
+.metric-trend { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; margin-top: 5px; }
+.trend-up { color: var(--green); }
+.trend-dn { color: var(--red); }
+
+/* TWO COLUMN */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+/* PIPELINE KANBAN */
+.pipeline-board {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pipeline-col {
+  min-width: 210px;
+  max-width: 210px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  flex-shrink: 0;
+}
+
+.col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.col-title { font-size: 12px; font-weight: 600; color: var(--text2); }
+.col-count { font-size: 11px; font-weight: 700; color: var(--text3); background: var(--bg4); padding: 2px 7px; border-radius: 99px; }
+.col-value { font-size: 11px; color: var(--green); font-weight: 600; margin-bottom: 10px; }
+
+.lead-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 11px 12px;
+  margin-bottom: 7px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.lead-card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: var(--shadow); }
+.lead-card-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; line-height: 1.3; }
+.lead-card-co { font-size: 11px; color: var(--text3); margin-bottom: 8px; }
+.lead-card-footer { display: flex; align-items: center; justify-content: space-between; }
+.lead-card-value { font-size: 12px; font-weight: 600; color: var(--green); }
+
+/* STATUS PILLS */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.sp-new { background: var(--blue-bg); color: var(--blue); }
+.sp-gesprek { background: var(--amber-bg); color: var(--amber); }
+.sp-voorstel { background: var(--violet-bg); color: var(--violet); }
+.sp-onderhandeling { background: rgba(236,72,153,0.08); color: #ec4899; }
+.sp-klant { background: var(--green-bg); color: var(--green); }
+.sp-verloren { background: var(--red-bg); color: var(--red); }
+.sp-hold { background: var(--bg4); color: var(--text3); }
+
+/* ACTIVITY FEED */
+.activity-list { display: flex; flex-direction: column; }
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.activity-item:last-child { border: none; }
+.activity-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.act-calendly { background: rgba(0,201,177,0.1); color: #00c9b1; }
+.act-make { background: rgba(255,109,0,0.1); color: #ff6d00; }
+.act-webhook { background: var(--violet-bg); color: var(--violet); }
+.act-manual { background: var(--bg4); color: var(--text2); }
+.act-status { background: var(--amber-bg); color: var(--amber); }
+.act-deal { background: var(--green-bg); color: var(--green); }
+
+.activity-body { flex: 1; min-width: 0; }
+.activity-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.activity-meta { font-size: 12px; color: var(--text3); margin-top: 3px; }
+.activity-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 7px; border-radius: 99px; margin-right: 6px; }
+
+/* DETAIL PANEL */
+.detail-panel {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 400px;
+  background: var(--bg);
+  border-left: 1px solid var(--border2);
+  z-index: 200;
+  overflow-y: auto;
+  padding: 24px;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  box-shadow: var(--shadow-lg);
+}
+.detail-panel.open { transform: translateX(0); }
+
+.detail-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+.detail-name { font-family: var(--font-serif); font-size: 24px; letter-spacing: -0.02em; margin-bottom: 3px; }
+.detail-company { font-size: 14px; color: var(--text2); }
+
+.detail-deal-box {
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 16px 0;
+  text-align: center;
+}
+.detail-deal-label { font-size: 11px; color: var(--green); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+.detail-deal-value { font-family: var(--font-serif); font-size: 28px; color: var(--green); letter-spacing: -0.02em; }
+
+.detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+.detail-row:last-child { border: none; }
+.detail-key { font-size: 12px; color: var(--text3); font-weight: 500; flex-shrink: 0; }
+.detail-val { font-size: 13px; color: var(--text); text-align: right; word-break: break-word; }
+
+.detail-notes {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 16px;
+}
+
+.detail-actions { display: flex; gap: 8px; margin-top: 20px; }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg3);
+  border-radius: var(--radius);
+  padding: 3px;
+  width: fit-content;
+  margin-bottom: 18px;
+}
+.tab-btn {
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all 0.12s;
+  border: none;
+  background: none;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { background: var(--bg); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+
+/* SEARCH BAR */
+.search-bar {
+  position: relative;
+  margin-bottom: 16px;
+}
+.search-bar svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
+.search-input { padding-left: 38px !important; background: var(--bg2) !important; }
+
+/* TEAM PAGE */
+.team-member-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.team-member-card:hover { border-color: var(--border2); }
+.tm-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+  flex-shrink: 0;
+}
+.tm-info { flex: 1; min-width: 0; }
+.tm-name { font-size: 14px; font-weight: 500; color: var(--text); }
+.tm-email { font-size: 12px; color: var(--text3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tm-role { font-size: 12px; }
+
+.invite-card {
+  background: var(--bg2);
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 12px;
+}
+.invite-card:hover { background: var(--bg3); border-color: var(--text3); }
+
+/* WEBHOOK / INTEGRATIONS PAGE */
+.integration-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: border-color 0.15s;
+}
+.integration-card:hover { border-color: var(--border2); }
+
+.int-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+}
+.int-info { display: flex; align-items: center; gap: 12px; }
+.int-logo {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.int-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.int-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+.int-status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-active { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-inactive { background: var(--text3); }
+
+.webhook-url-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+.webhook-url-text {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.int-events { margin-top: 12px; }
+.int-event-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text2);
+}
+.int-event-row:last-child { border: none; }
+.int-event-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.int-event-time { margin-left: auto; font-size: 11px; color: var(--text3); font-family: var(--font-mono); white-space: nowrap; }
+
+/* SETTINGS PAGE */
+.settings-section { margin-bottom: 28px; }
+.settings-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: var(--text); }
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 20px;
+}
+.setting-row:last-child { border: none; }
+.setting-info { flex: 1; }
+.setting-label { font-size: 14px; font-weight: 500; color: var(--text); }
+.setting-sub { font-size: 12px; color: var(--text3); margin-top: 3px; }
+
+/* TOGGLE SWITCH */
+.toggle {
+  position: relative;
+  width: 40px; height: 22px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--bg4);
+  border-radius: 99px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid var(--border2);
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  left: 3px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  background: var(--text3);
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+.toggle input:checked + .toggle-slider { background: var(--text); border-color: transparent; }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px) translateY(-50%); background: var(--bg); }
+
+/* ══════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════ */
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .hamburger { display: flex; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  .detail-panel { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .content { padding: 16px; }
+  .topbar { padding: 0 16px; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .metric-card { padding: 14px; }
+  .metric-value { font-size: 24px; }
+  .pipeline-col { min-width: 185px; max-width: 185px; }
+}
+
+@media (max-width: 400px) {
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <button class="workspace-btn" onclick="toggleWorkspaceMenu()">
+      <div class="ws-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div>
+        <div class="ws-name" id="ws-name">CtrlSync</div>
+        <div class="ws-plan" id="ws-plan">Team plan</div>
+      </div>
+      <svg class="ws-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overzicht</div>
+    <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">
+      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" data-page="activiteit" onclick="showPage('activiteit', this)">
+      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Activiteit
+      <span class="nav-badge nav-badge-amber" id="activity-badge">3</span>
+    </button>
+
+    <div class="nav-section-label">CRM</div>
+    <button class="nav-item" data-page="pipeline" onclick="showPage('pipeline', this)">
+      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h12M3 18h8"/></svg>
+      Pipeline
+    </button>
+    <button class="nav-item" data-page="leads" onclick="showPage('leads', this)">
+      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Leads
+      <span class="nav-badge" id="leads-badge">1</span>
+    </button>
+    <button class="nav-item" data-page="klanten" onclick="showPage('klanten', this)">
+      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      Vaste klanten
+    </button>
+    <button class="nav-item" data-page="taken" onclick="showPage('taken', this)">
+      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Taken
+    </button>
+
+    <div class="nav-section-label">Workspace</div>
+    <button class="nav-item" data-page="integraties" onclick="showPage('integraties', this)">
+      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Integraties
+    </button>
+    <button class="nav-item" data-page="team" onclick="showPage('team', this)">
+      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Team
+    </button>
+    <button class="nav-item" data-page="instellingen" onclick="showPage('instellingen', this)">
+      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
+      Instellingen
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="user-btn" id="user-btn">
+      <div class="user-avatar" id="user-avatar">T</div>
+      <div style="flex:1;min-width:0;">
+        <div class="user-name" id="user-name">Thomas</div>
+        <div class="user-email" id="user-email">thomas@ctrlsync.nl</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 class="page-heading" id="page-heading">Dashboard</h1>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <svg id="ti-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+        <svg id="ti-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn btn-sm btn-solid" onclick="openLeadModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span class="hide-sm">Nieuwe lead</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENT AREA -->
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="pg-dashboard" class="page-view" style="display:block;">
+      <div class="metrics-grid">
+        <div class="metric-card" onclick="showPage('leads', null)">
+          <div class="metric-label">Totaal leads</div>
+          <div class="metric-value" id="m-total">0</div>
+          <div class="metric-sub">Alle tijd</div>
+        </div>
+        <div class="metric-card" onclick="showPage('pipeline', null)">
+          <div class="metric-label">Pipeline waarde</div>
+          <div class="metric-value" id="m-pipeline">€0</div>
+          <div class="metric-sub">Actieve deals</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Gem. deal</div>
+          <div class="metric-value" id="m-gem">€0</div>
+          <div class="metric-sub">Per actieve lead</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Conversie</div>
+          <div class="metric-value" id="m-conv">0%</div>
+          <div class="metric-sub">Lead → Klant</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid" style="margin-bottom:20px;">
+        <div class="metric-card">
+          <div class="metric-label">Gefactureerd</div>
+          <div class="metric-value metric-value-sm" id="m-gefact">€0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Open bedrag</div>
+          <div class="metric-value metric-value-sm" id="m-open">€0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Klanten</div>
+          <div class="metric-value metric-value-sm" id="m-klanten">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Hoge prioriteit</div>
+          <div class="metric-value metric-value-sm" id="m-prio">0</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Pipeline per status</div></div>
+          <div id="status-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recente activiteit</div>
+            <button class="btn btn-sm btn-ghost" onclick="showPage('activiteit', null)">Alle →</button>
+          </div>
+          <div id="dash-activity"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header">
+          <div class="card-title">Recente leads</div>
+          <button class="btn btn-sm btn-ghost" onclick="showPage('leads', null)">Alle leads →</button>
+        </div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Naam</th><th>Status</th><th>Bron</th><th>Waarde</th><th>Prioriteit</th></tr></thead>
+          <tbody id="dash-leads-table"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ACTIVITEIT ── -->
+    <div id="pg-activiteit" class="page-view" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Activiteiten feed</div>
+          <button class="btn btn-sm btn-ghost" onclick="addDemoActivity()">+ Simuleer event</button>
+        </div>
+        <div id="full-activity-list"></div>
+      </div>
+    </div>
+
+    <!-- ── PIPELINE ── -->
+    <div id="pg-pipeline" class="page-view" style="display:none;">
+      <div class="pipeline-board" id="pipeline-board"></div>
+    </div>
+
+    <!-- ── LEADS ── -->
+    <div id="pg-leads" class="page-view" style="display:none;">
+      <div class="search-bar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="text" placeholder="Zoek op naam, bedrijf of niche..." oninput="filterLeads(this.value)">
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Naam</th><th>Bedrijf</th><th>Status</th><th>Bron</th><th>Niche</th><th>Deal</th><th>Gefact.</th><th>Prio.</th><th>Volgende actie</th></tr></thead>
+            <tbody id="leads-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── KLANTEN ── -->
+    <div id="pg-klanten" class="page-view" style="display:none;">
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Naam</th><th>Bedrijf</th><th>Dienst</th><th>Deal waarde</th><th>Gefactureerd</th><th>Open</th><th>Bron</th></tr></thead>
+            <tbody id="klanten-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAKEN ── -->
+    <div id="pg-taken" class="page-view" style="display:none;">
+      <div style="margin-bottom:16px;">
+        <button class="btn btn-solid btn-sm" onclick="openTaakModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nieuwe taak
+        </button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Taak</th><th>Lead/Klant</th><th>Type</th><th>Status</th><th>Prioriteit</th><th>Deadline</th></tr></thead>
+            <tbody id="taken-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── INTEGRATIES ── -->
+    <div id="pg-integraties" class="page-view" style="display:none;">
+      <p style="font-size:14px;color:var(--text2);margin-bottom:20px;max-width:600px;">Koppel externe tools om leads automatisch te importeren en acties te triggeren. Gebruik de webhook URL in Make, Zapier of n8n.</p>
+
+      <!-- INBOUND WEBHOOK URL -->
+      <div class="integration-card">
+        <div class="int-header">
+          <div class="int-info">
+            <div class="int-logo" style="background:var(--violet-bg);font-size:18px;">🔗</div>
+            <div>
+              <div class="int-name">Inbound Webhook URL</div>
+              <div class="int-desc">Stuur leads vanuit elke tool naar CtrlSync</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);">
+            <div class="int-status-dot status-active"></div> Actief
+          </div>
+        </div>
+        <div class="webhook-url-box">
+          <div class="webhook-url-text" id="webhook-url">https://api.ctrlsync.nl/webhook/ws_demo_abc123xyz</div>
+          <button class="btn btn-ghost btn-sm" onclick="copyWebhook()">Kopieer</button>
+        </div>
+        <p style="font-size:12px;color:var(--text3);margin-top:10px;">Stuur een POST request met JSON body: <code style="font-family:var(--font-mono);background:var(--bg3);padding:2px 6px;border-radius:4px;">{"naam":"...","email":"...","bron":"..."}</code></p>
+      </div>
+
+      <!-- CALENDLY -->
+      <div class="integration-card">
+        <div class="int-header">
+          <div class="int-info">
+            <div class="int-logo" style="background:rgba(0,201,177,0.1);">📅</div>
+            <div>
+              <div class="int-name">Calendly</div>
+              <div class="int-desc">Nieuwe afspraken worden automatisch als lead toegevoegd</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;" id="calendly-status-text">
+              <div class="int-status-dot" id="calendly-dot" style="background:var(--text3);"></div>
+              <span id="calendly-status-label">Niet gekoppeld</span>
+            </div>
+            <button class="btn btn-sm btn-ghost" id="calendly-btn" onclick="toggleCalendly()">Koppelen</button>
+          </div>
+        </div>
+        <div id="calendly-config" style="display:none;">
+          <div class="form-group" style="margin-bottom:10px;">
+            <label>Calendly Webhook Secret</label>
+            <input type="text" id="calendly-secret" placeholder="Plak hier je Calendly webhook signing secret" />
+          </div>
+          <p style="font-size:12px;color:var(--text3);">Voeg deze webhook URL toe in Calendly → Integraties → Webhooks:</p>
+          <div class="webhook-url-box" style="margin-top:8px;">
+            <div class="webhook-url-text">https://api.ctrlsync.nl/webhook/calendly/ws_demo</div>
+            <button class="btn btn-ghost btn-sm" onclick="copyText('https://api.ctrlsync.nl/webhook/calendly/ws_demo')">Kopieer</button>
+          </div>
+          <div class="int-events" style="margin-top:14px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">Ontvangen events</div>
+            <div class="int-event-row"><div class="int-event-dot"></div>invitee.created — Sarah M. boekte een gesprek<div class="int-event-time">vandaag 14:23</div></div>
+            <div class="int-event-row"><div class="int-event-dot"></div>invitee.created — Anna K. boekte een gesprek<div class="int-event-time">gisteren 10:11</div></div>
+            <div class="int-event-row"><div class="int-event-dot" style="background:var(--red);"></div>invitee.canceled — Thomas B. annuleerde<div class="int-event-time">2 dagen geleden</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAKE -->
+      <div class="integration-card">
+        <div class="int-header">
+          <div class="int-info">
+            <div class="int-logo" style="background:rgba(255,109,0,0.1);">⚙️</div>
+            <div>
+              <div class="int-name">Make.com</div>
+              <div class="int-desc">Koppel scenarios om leads te importeren of acties te triggeren</div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="showMakeGuide()">Setup guide</button>
+        </div>
+        <div id="make-guide" style="display:none;background:var(--bg3);border-radius:var(--radius);padding:14px;font-size:13px;color:var(--text2);">
+          <strong style="color:var(--text);">Make scenario instellen:</strong><br>
+          1. Maak een nieuw scenario in Make<br>
+          2. Voeg een "Webhook" module toe als trigger<br>
+          3. Voeg een "HTTP — Make a request" module toe<br>
+          4. Stel de URL in op je inbound webhook URL hierboven<br>
+          5. Methode: POST · Body type: JSON<br>
+          6. Map de velden: naam, email, bron, notities
+        </div>
+      </div>
+
+      <!-- N8N / ZAPIER -->
+      <div class="integration-card">
+        <div class="int-header">
+          <div class="int-info">
+            <div class="int-logo" style="background:rgba(239,83,80,0.1);">🔄</div>
+            <div>
+              <div class="int-name">n8n / Zapier</div>
+              <div class="int-desc">Gebruik de webhook URL in elk automation platform</div>
+            </div>
+          </div>
+          <span class="badge badge-green">Compatibel</span>
+        </div>
+        <p style="font-size:13px;color:var(--text2);">Gebruik de inbound webhook URL bovenaan deze pagina in elk n8n of Zapier workflow als HTTP POST endpoint.</p>
+      </div>
+
+      <!-- TEST WEBHOOK -->
+      <div class="card" style="margin-top:4px;">
+        <div class="card-title" style="margin-bottom:14px;">Webhook testen</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Simuleer een inkomend webhook event om je integratie te testen.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Naam</label>
+            <input type="text" id="test-naam" placeholder="Test Lead" value="Sarah Martinez" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="test-email" placeholder="test@email.nl" value="sarah@example.com" />
+          </div>
+          <div class="form-group">
+            <label>Bron</label>
+            <select id="test-bron">
+              <option value="Calendly">Calendly</option>
+              <option value="Make">Make.com</option>
+              <option value="Zapier">Zapier</option>
+              <option value="Webhook">Webhook</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Notitie</label>
+            <input type="text" id="test-note" placeholder="Optionele notitie" value="Calendly afspraak geboekt" />
+          </div>
+        </div>
+        <button class="btn btn-solid btn-sm" style="margin-top:14px;" onclick="testWebhook()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 12 12 5 19 12"/><polyline points="5 19 12 12 19 19"/></svg>
+          Stuur test event
+        </button>
+      </div>
+    </div>
+
+    <!-- ── TEAM ── -->
+    <div id="pg-team" class="page-view" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <p style="font-size:14px;color:var(--text2);">Beheer je teamleden en uitnodigingen.</p>
+        <button class="btn btn-solid btn-sm" onclick="openInviteModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Uitnodigen
+        </button>
+      </div>
+      <div id="team-list"></div>
+    </div>
+
+    <!-- ── INSTELLINGEN ── -->
+    <div id="pg-instellingen" class="page-view" style="display:none;">
+      <div class="card">
+        <div class="settings-section">
+          <div class="settings-title">Profiel</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Naam</label><input type="text" id="set-name" /></div>
+            <div class="form-group"><label>Email</label><input type="email" id="set-email" /></div>
+          </div>
+          <div class="form-group" style="margin-top:14px;"><label>Workspace naam</label><input type="text" id="set-workspace" /></div>
+          <button class="btn btn-solid btn-sm" style="margin-top:16px;" onclick="saveSettings()">Opslaan</button>
+        </div>
+
+        <hr class="divider">
+
+        <div class="settings-section">
+          <div class="settings-title">Weergave</div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Dark mode</div>
+              <div class="setting-sub">Schakel tussen licht en donker thema</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="dark-toggle" onchange="toggleThemeFromToggle(this)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Compacte weergave</div>
+              <div class="setting-sub">Minder witruimte in tabellen</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="compact-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="settings-section">
+          <div class="settings-title">Notificaties</div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Nieuwe webhook events</div>
+              <div class="setting-sub">Melding bij inkomende leads via webhook</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Calendly afspraken</div>
+              <div class="setting-sub">Melding bij nieuwe Calendly boeking</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Taak deadlines</div>
+              <div class="setting-sub">Dagelijks overzicht van openstaande taken</div>
+            </div>
+            <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="settings-section">
+          <div class="settings-title">Abonnement</div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-size:15px;font-weight:600;" id="plan-display">Team plan</span>
+              <span class="badge badge-green">Actief</span>
+            </div>
+            <div style="font-size:13px;color:var(--text2);">€79/maand · Volgende betaling: 12 april 2026</div>
+          </div>
+          <button class="btn btn-ghost btn-sm">Abonnement wijzigen</button>
+          <button class="btn btn-danger btn-sm" style="margin-left:8px;">Opzeggen</button>
+        </div>
+
+        <hr class="divider">
+
+        <div class="settings-section">
+          <div class="settings-title">Account</div>
+          <button class="btn btn-danger btn-sm" onclick="doLogout()">Uitloggen</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-top">
+    <div>
+      <div class="detail-name" id="dp-name">—</div>
+      <div class="detail-company" id="dp-company">—</div>
+    </div>
+    <button class="modal-close" onclick="closeDetail()">×</button>
+  </div>
+  <div id="dp-status"></div>
+  <div id="dp-deal-box"></div>
+  <div id="dp-rows"></div>
+  <div id="dp-notes"></div>
+  <div class="detail-actions">
+    <button class="btn btn-solid" style="flex:1;" id="dp-edit-btn">Bewerken</button>
+    <button class="btn btn-ghost" id="dp-delete-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- LEAD MODAL -->
+<div class="modal-overlay" id="lead-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="lm-title">Nieuwe lead</div>
+      <button class="modal-close" onclick="closeLeadModal()">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Naam *</label><input type="text" id="f-naam" placeholder="Volledige naam" /></div>
+      <div class="form-group"><label>Bedrijf</label><input type="text" id="f-bedrijf" placeholder="Bedrijfsnaam" /></div>
+      <div class="form-group"><label>Email</label><input type="email" id="f-email" placeholder="email@..." /></div>
+      <div class="form-group"><label>Telefoon</label><input type="tel" id="f-tel" placeholder="+31 6..." /></div>
+      <div class="form-group"><label>Status</label>
+        <select id="f-status">
+          <option>🆕 Nieuw</option><option>📞 Gesprek Ingepland</option><option>📋 Voorstel Verstuurd</option>
+          <option>🤝 Onderhandeling</option><option>✅ Klant</option><option>❌ Verloren</option><option>💤 On Hold</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Bron</label>
+        <select id="f-bron">
+          <option>TikTok</option><option>Instagram</option><option>LinkedIn</option>
+          <option>Referral</option><option>Website</option><option>Calendly</option><option>Make</option><option>Webhook</option><option>Direct</option><option>Anders</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Niche</label>
+        <select id="f-niche">
+          <option>Personal Brand</option><option>E-commerce</option><option>SaaS</option>
+          <option>MKB Dienstverlening</option><option>Coaching</option><option>Anders</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Prioriteit</label>
+        <select id="f-prio"><option>🔥 Hoog</option><option>⚡ Middel</option><option>🌱 Laag</option></select>
+      </div>
+      <div class="form-group"><label>Deal waarde (€)</label><input type="number" id="f-deal" placeholder="0" min="0" /></div>
+      <div class="form-group"><label>Gefactureerd (€)</label><input type="number" id="f-gefact" placeholder="0" min="0" /></div>
+      <div class="form-group"><label>Open bedrag (€)</label><input type="number" id="f-open" placeholder="0" min="0" /></div>
+      <div class="form-group"><label>Volgende actie</label><input type="date" id="f-actie" /></div>
+      <div class="form-group"><label>Dienst</label>
+        <select id="f-dienst">
+          <option>CRM Systeem</option><option>Automation</option><option>AI Integratie</option>
+          <option>Website</option><option>Strategie</option><option>YieldSlice</option><option>Anders</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Website</label><input type="url" id="f-website" placeholder="https://" /></div>
+      <div class="form-group full"><label>Notities</label><textarea id="f-notes" placeholder="Aantekeningen..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeLeadModal()">Annuleren</button>
+      <button class="btn btn-solid" onclick="saveLead()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAAK MODAL -->
+<div class="modal-overlay" id="taak-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nieuwe taak</div>
+      <button class="modal-close" onclick="document.getElementById('taak-modal').classList.remove('open')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Taak *</label><input type="text" id="t-taak" placeholder="Omschrijving" /></div>
+      <div class="form-group"><label>Lead / Klant</label><select id="t-lead"></select></div>
+      <div class="form-group"><label>Type</label>
+        <select id="t-type">
+          <option>📞 Opvolging</option><option>📋 Voorstel</option><option>🔧 Uitvoering</option>
+          <option>📊 Rapportage</option><option>💬 Meeting</option><option>📧 Email</option><option>⚙️ Systeem</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Status</label>
+        <select id="t-status">
+          <option>📥 To Do</option><option>🔄 In Progress</option><option>✅ Gedaan</option><option>⏸️ Geblokkeerd</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Prioriteit</label>
+        <select id="t-prio"><option>🔥 Urgent</option><option>⚡ Hoog</option><option>📌 Normaal</option><option>🌱 Laag</option></select>
+      </div>
+      <div class="form-group"><label>Deadline</label><input type="date" id="t-deadline" /></div>
+      <div class="form-group full"><label>Notitie</label><textarea id="t-note" placeholder="Extra info..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('taak-modal').classList.remove('open')">Annuleren</button>
+      <button class="btn btn-solid" onclick="saveTaak()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="modal-overlay" id="invite-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Teamlid uitnodigen</div>
+      <button class="modal-close" onclick="document.getElementById('invite-modal').classList.remove('open')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Email</label><input type="email" id="inv-email" placeholder="collega@bedrijf.nl" /></div>
+      <div class="form-group full"><label>Naam</label><input type="text" id="inv-name" placeholder="Voornaam" /></div>
+      <div class="form-group full"><label>Rol</label>
+        <select id="inv-role"><option value="member">Member — Kan leads bekijken en bewerken</option><option value="admin">Admin — Kan ook instellingen wijzigen</option><option value="viewer">Viewer — Alleen lezen</option></select>
+      </div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-top:12px;font-size:13px;color:var(--text2);">
+      Ze ontvangen een uitnodigingsmail met een link om een account aan te maken.
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('invite-modal').classList.remove('open')">Annuleren</button>
+      <button class="btn btn-solid" onclick="sendInvite()">Uitnodiging versturen</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="app-toast"></div>
+
+<script>
+/* ══════════════════════════════════
+   DATA & STORAGE
+══════════════════════════════════ */
+let leads = JSON.parse(localStorage.getItem('cs-leads') || '[]');
+let taken = JSON.parse(localStorage.getItem('cs-taken') || '[]');
+let activity = JSON.parse(localStorage.getItem('cs-activity') || '[]');
+let teamMembers = JSON.parse(localStorage.getItem('cs-team') || '[]');
+let editingId = null;
+let currentUser = JSON.parse(localStorage.getItem('cs-user') || 'null');
+
+// Seed initial data
+if (!currentUser) { window.location.href = 'login.html'; }
+
+if (leads.length === 0) {
+  leads = [{
+    id: Date.now(), naam: 'Business Partner Personal Brands', bedrijf: 'Personal Brand Agency',
+    email: '', tel: '', status: '📞 Gesprek Ingepland', bron: 'TikTok', niche: 'Personal Brand',
+    prio: '🔥 Hoog', deal: 2500, gefact: 0, open: 0, actie: '2026-03-18',
+    dienst: 'CRM Systeem', website: '', notes: 'Via TikTok → Instagram DM. Zoekt systemen + AI. Gesprek dinsdag.',
+    created: new Date().toISOString()
+  }];
+  saveLeads();
+}
+
+if (activity.length === 0) {
+  activity = [
+    { id: 1, type: 'calendly', title: 'Calendly afspraak geboekt', body: 'Sarah Martinez boekte een kennismakingsgesprek', time: new Date(Date.now()-3600000).toISOString(), tag: 'Calendly' },
+    { id: 2, type: 'make', title: 'Lead via Make.com', body: 'Thomas B. (thomas@example.com) binnengehaald via contactformulier scenario', time: new Date(Date.now()-86400000).toISOString(), tag: 'Make' },
+    { id: 3, type: 'status', title: 'Status gewijzigd', body: 'Anna K. → Voorstel Verstuurd', time: new Date(Date.now()-172800000).toISOString(), tag: 'Pipeline' },
+    { id: 4, type: 'manual', title: 'Nieuwe lead toegevoegd', body: 'Business Partner Personal Brands handmatig toegevoegd', time: new Date(Date.now()-259200000).toISOString(), tag: 'Handmatig' },
+  ];
+  localStorage.setItem('cs-activity', JSON.stringify(activity));
+}
+
+if (teamMembers.length === 0) {
+  teamMembers = [
+    { id: 'u1', name: currentUser?.name || 'Thomas', email: currentUser?.email || 'thomas@ctrlsync.nl', role: 'owner', avatar: (currentUser?.name||'T')[0].toUpperCase(), color: '#7c3aed' }
+  ];
+  localStorage.setItem('cs-team', JSON.stringify(teamMembers));
+}
+
+function saveLeads() { localStorage.setItem('cs-leads', JSON.stringify(leads)); }
+function saveTaken2() { localStorage.setItem('cs-taken', JSON.stringify(taken)); }
+
+/* ══════════════════════════════════
+   THEME
+══════════════════════════════════ */
+const savedTheme = localStorage.getItem('cs-theme') || 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+document.getElementById('ti-sun').style.display = savedTheme === 'light' ? 'block' : 'none';
+document.getElementById('ti-moon').style.display = savedTheme === 'light' ? 'none' : 'block';
+const darkToggle = document.getElementById('dark-toggle');
+if (darkToggle) darkToggle.checked = savedTheme === 'dark';
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  applyTheme(isDark ? 'light' : 'dark');
+}
+function toggleThemeFromToggle(el) { applyTheme(el.checked ? 'dark' : 'light'); }
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('ti-sun').style.display = t === 'light' ? 'block' : 'none';
+  document.getElementById('ti-moon').style.display = t === 'light' ? 'none' : 'block';
+  if (darkToggle) darkToggle.checked = t === 'dark';
+  localStorage.setItem('cs-theme', t);
+}
+
+/* ══════════════════════════════════
+   USER INFO
+══════════════════════════════════ */
+function loadUserInfo() {
+  if (!currentUser) return;
+  const n = currentUser.name || 'Thomas';
+  document.getElementById('user-name').textContent = n;
+  document.getElementById('user-email').textContent = currentUser.email || '';
+  document.getElementById('user-avatar').textContent = n[0].toUpperCase();
+  document.getElementById('ws-name').textContent = currentUser.workspace || 'CtrlSync';
+  const planNames = { solo: 'Solo plan', team: 'Team plan', agency: 'Agency plan' };
+  document.getElementById('ws-plan').textContent = planNames[currentUser.plan] || 'Team plan';
+  document.getElementById('plan-display').textContent = planNames[currentUser.plan] || 'Team plan';
+  if (document.getElementById('set-name')) document.getElementById('set-name').value = n;
+  if (document.getElementById('set-email')) document.getElementById('set-email').value = currentUser.email || '';
+  if (document.getElementById('set-workspace')) document.getElementById('set-workspace').value = currentUser.workspace || '';
+}
+
+/* ══════════════════════════════════
+   NAVIGATION
+══════════════════════════════════ */
+const PAGE_TITLES = { dashboard:'Dashboard', activiteit:'Activiteit', pipeline:'Pipeline', leads:'Leads', klanten:'Vaste klanten', taken:'Taken', integraties:'Integraties', team:'Team', instellingen:'Instellingen' };
+
+function showPage(page, btn) {
+  document.querySelectorAll('.page-view').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('pg-' + page);
+  if (el) el.style.display = 'block';
+  document.getElementById('page-heading').textContent = PAGE_TITLES[page] || page;
+  if (btn) { btn.classList.add('active'); }
+  else {
+    document.querySelectorAll('.nav-item').forEach(v => { if (v.dataset.page === page) v.classList.add('active'); });
+  }
+  closeDetail();
+  closeSidebar();
+  renderAll();
+}
+
+/* ══════════════════════════════════
+   SIDEBAR (MOBILE)
+══════════════════════════════════ */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+function toggleWorkspaceMenu() {}
+
+/* ══════════════════════════════════
+   RENDER
+══════════════════════════════════ */
+const STATUS_MAP = {
+  '🆕 Nieuw':'sp-new','📞 Gesprek Ingepland':'sp-gesprek','📋 Voorstel Verstuurd':'sp-voorstel',
+  '🤝 Onderhandeling':'sp-onderhandeling','✅ Klant':'sp-klant','❌ Verloren':'sp-verloren','💤 On Hold':'sp-hold'
+};
+const STATUS_COLORS = {
+  '🆕 Nieuw':'#60a5fa','📞 Gesprek Ingepland':'#fbbf24','📋 Voorstel Verstuurd':'#a78bfa',
+  '🤝 Onderhandeling':'#ec4899','✅ Klant':'#4ade80','❌ Verloren':'#f87171','💤 On Hold':'#6b7280'
+};
+const STATUS_ORDER = ['🆕 Nieuw','📞 Gesprek Ingepland','📋 Voorstel Verstuurd','🤝 Onderhandeling','✅ Klant','❌ Verloren','💤 On Hold'];
+
+function fmt(n) { return '€' + Math.round(n||0).toLocaleString('nl-NL'); }
+function statusPill(s) { return `<span class="status-pill ${STATUS_MAP[s]||'sp-new'}">${s}</span>`; }
+function prioBadge(p) { const c = p==='🔥 Hoog'?'badge-red':p==='⚡ Middel'?'badge-amber':'badge-gray'; return `<span class="badge ${c}">${p}</span>`; }
+function fmtDate(d) { if(!d) return '—'; return new Date(d).toLocaleDateString('nl-NL',{day:'numeric',month:'short'}); }
+function fmtTime(d) {
+  const now = new Date(), dt = new Date(d);
+  const diff = Math.floor((now - dt) / 60000);
+  if (diff < 2) return 'nu';
+  if (diff < 60) return diff + 'm geleden';
+  if (diff < 1440) return Math.floor(diff/60) + 'u geleden';
+  return Math.floor(diff/1440) + 'd geleden';
+}
+
+function renderAll() {
+  renderMetrics();
+  renderStatusChart();
+  renderDashActivity();
+  renderDashLeads();
+  renderPipeline();
+  renderLeadsTable(leads);
+  renderKlantenTable();
+  renderTakenTable();
+  renderFullActivity();
+  renderTeam();
+  updateBadges();
+}
+
+function renderMetrics() {
+  const active = leads.filter(l => !['❌ Verloren','💤 On Hold'].includes(l.status));
+  const klanten = leads.filter(l => l.status === '✅ Klant');
+  const pipeline = active.reduce((s,l)=>s+(l.deal||0),0);
+  const gefact = leads.reduce((s,l)=>s+(l.gefact||0),0);
+  const open = leads.reduce((s,l)=>s+(l.open||0),0);
+  const gem = active.length ? pipeline/active.length : 0;
+  const conv = leads.length ? Math.round(klanten.length/leads.length*100) : 0;
+  const prio = leads.filter(l=>l.prio==='🔥 Hoog').length;
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('m-total', leads.length); set('m-pipeline', fmt(pipeline)); set('m-gem', fmt(gem));
+  set('m-conv', conv+'%'); set('m-gefact', fmt(gefact)); set('m-open', fmt(open));
+  set('m-klanten', klanten.length); set('m-prio', prio);
+}
+
+function renderStatusChart() {
+  const el = document.getElementById('status-chart'); if(!el) return;
+  const counts = {};
+  leads.forEach(l => counts[l.status] = (counts[l.status]||0)+1);
+  const max = Math.max(...Object.values(counts), 1);
+  el.innerHTML = STATUS_ORDER.map(s => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:12px;color:var(--text2);min-width:155px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s}</div>
+      <div style="flex:1;height:5px;background:var(--bg4);border-radius:99px;overflow:hidden;">
+        <div style="height:100%;width:${Math.round(((counts[s]||0)/max)*100)}%;background:${STATUS_COLORS[s]};border-radius:99px;transition:width 0.4s;"></div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);min-width:20px;text-align:right;">${counts[s]||0}</div>
+    </div>
+  `).join('');
+}
+
+const ACT_ICONS = {
+  calendly: { cls:'act-calendly', svg:'📅' },
+  make: { cls:'act-make', svg:'⚙️' },
+  webhook: { cls:'act-webhook', svg:'🔗' },
+  manual: { cls:'act-manual', svg:'✏️' },
+  status: { cls:'act-status', svg:'↗️' },
+  deal: { cls:'act-deal', svg:'💰' },
+};
+
+function activityHTML(a, limit) {
+  const list = limit ? activity.slice(0,limit) : activity;
+  if (!list.length) return '<div class="empty-state"><div class="empty-title">Nog geen activiteit</div></div>';
+  return '<div class="activity-list">' + list.map(a => {
+    const ic = ACT_ICONS[a.type] || ACT_ICONS.manual;
+    return `<div class="activity-item">
+      <div class="activity-icon ${ic.cls}">${ic.svg}</div>
+      <div class="activity-body">
+        <div class="activity-title">${a.title}</div>
+        <div class="activity-meta">
+          <span class="badge badge-gray" style="font-size:10px;">${a.tag}</span>
+          <span style="margin-left:6px;">${a.body}</span>
+          <span style="margin-left:8px;color:var(--text3);">· ${fmtTime(a.time)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+function renderDashActivity() { const el = document.getElementById('dash-activity'); if(el) el.innerHTML = activityHTML(activity, 4); }
+function renderFullActivity() { const el = document.getElementById('full-activity-list'); if(el) el.innerHTML = activityHTML(activity); }
+
+function renderDashLeads() {
+  const el = document.getElementById('dash-leads-table'); if(!el) return;
+  const recent = [...leads].sort((a,b)=>new Date(b.created)-new Date(a.created)).slice(0,6);
+  if (!recent.length) { el.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px;">Nog geen leads</td></tr>'; return; }
+  el.innerHTML = recent.map(l => `
+    <tr onclick="openDetail(${l.id})">
+      <td class="td-primary">${l.naam}</td>
+      <td>${statusPill(l.status)}</td>
+      <td><span class="badge badge-gray">${l.bron||'—'}</span></td>
+      <td style="color:var(--green);font-weight:600;">${l.deal?fmt(l.deal):'—'}</td>
+      <td>${prioBadge(l.prio)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderPipeline() {
+  const el = document.getElementById('pipeline-board'); if(!el) return;
+  el.innerHTML = STATUS_ORDER.map(status => {
+    const col = leads.filter(l=>l.status===status);
+    const total = col.reduce((s,l)=>s+(l.deal||0),0);
+    return `<div class="pipeline-col">
+      <div class="col-header"><span class="col-title">${status}</span><span class="col-count">${col.length}</span></div>
+      ${total>0?`<div class="col-value">${fmt(total)}</div>`:''}
+      ${!col.length?'<div style="color:var(--text3);font-size:12px;text-align:center;padding:16px 0;">Leeg</div>':''}
+      ${col.map(l=>`
+        <div class="lead-card" onclick="openDetail(${l.id})">
+          <div class="lead-card-name">${l.naam}</div>
+          <div class="lead-card-co">${l.bedrijf||l.niche||''}</div>
+          <div class="lead-card-footer">
+            ${l.deal?`<span class="lead-card-value">${fmt(l.deal)}</span>`:'<span></span>'}
+            <span class="badge badge-gray" style="font-size:10px;">${l.bron||''}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderLeadsTable(data) {
+  const el = document.getElementById('leads-table'); if(!el) return;
+  if(!data.length){el.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:32px;">Geen leads gevonden</td></tr>';return;}
+  el.innerHTML = data.map(l=>`
+    <tr onclick="openDetail(${l.id})">
+      <td class="td-primary">${l.naam}</td>
+      <td>${l.bedrijf||'—'}</td>
+      <td>${statusPill(l.status)}</td>
+      <td><span class="badge badge-gray">${l.bron||'—'}</span></td>
+      <td style="color:var(--text2);">${l.niche||'—'}</td>
+      <td style="color:var(--green);font-weight:600;">${l.deal?fmt(l.deal):'—'}</td>
+      <td>${l.gefact?fmt(l.gefact):'—'}</td>
+      <td>${prioBadge(l.prio)}</td>
+      <td style="color:var(--text3);">${fmtDate(l.actie)}</td>
+    </tr>
+  `).join('');
+}
+
+function filterLeads(q) {
+  const filtered = leads.filter(l => [l.naam,l.bedrijf,l.niche,l.bron].some(v=>v&&v.toLowerCase().includes(q.toLowerCase())));
+  renderLeadsTable(filtered);
+}
+
+function renderKlantenTable() {
+  const el = document.getElementById('klanten-table'); if(!el) return;
+  const k = leads.filter(l=>l.status==='✅ Klant');
+  if(!k.length){el.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Nog geen vaste klanten</td></tr>';return;}
+  el.innerHTML = k.map(l=>`
+    <tr onclick="openDetail(${l.id})">
+      <td class="td-primary">${l.naam}</td><td>${l.bedrijf||'—'}</td><td>${l.dienst||'—'}</td>
+      <td style="color:var(--green);font-weight:600;">${l.deal?fmt(l.deal):'—'}</td>
+      <td>${l.gefact?fmt(l.gefact):'—'}</td>
+      <td style="color:${l.open>0?'var(--amber)':'var(--text3)'};">${l.open?fmt(l.open):'—'}</td>
+      <td><span class="badge badge-gray">${l.bron||'—'}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderTakenTable() {
+  const el = document.getElementById('taken-table'); if(!el) return;
+  if(!taken.length){el.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px;">Nog geen taken</td></tr>';return;}
+  el.innerHTML = taken.map(t=>{
+    const l = leads.find(x=>x.id==t.leadId);
+    return `<tr>
+      <td class="td-primary">${t.taak}</td><td>${l?l.naam:'—'}</td><td>${t.type||'—'}</td>
+      <td>${statusPill(t.status)}</td><td>${prioBadge(t.prio)}</td>
+      <td style="color:var(--text3);">${fmtDate(t.deadline)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTeam() {
+  const el = document.getElementById('team-list'); if(!el) return;
+  el.innerHTML = teamMembers.map(m=>`
+    <div class="team-member-card">
+      <div class="tm-avatar" style="background:${m.color||'var(--violet-bg)'};color:${m.color?'white':'var(--violet)'};">${m.avatar||m.name[0]}</div>
+      <div class="tm-info">
+        <div class="tm-name">${m.name}</div>
+        <div class="tm-email">${m.email}</div>
+      </div>
+      <span class="badge ${m.role==='owner'?'badge-violet':m.role==='admin'?'badge-blue':'badge-gray'}">${m.role==='owner'?'Eigenaar':m.role==='admin'?'Admin':m.role==='viewer'?'Viewer':'Member'}</span>
+    </div>
+  `).join('') + `
+    <div class="invite-card" onclick="openInviteModal()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" style="margin:0 auto 8px;display:block;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <div style="font-size:14px;font-weight:500;color:var(--text2);">Teamlid uitnodigen</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px;">Stuur een uitnodiging via email</div>
+    </div>
+  `;
+}
+
+function updateBadges() {
+  const active = leads.filter(l=>!['❌ Verloren','💤 On Hold','✅ Klant'].includes(l.status)).length;
+  const lb = document.getElementById('leads-badge'); if(lb) lb.textContent = active;
+  const ab = document.getElementById('activity-badge'); if(ab) ab.textContent = Math.min(activity.length, 9);
+}
+
+/* ══════════════════════════════════
+   DETAIL PANEL
+══════════════════════════════════ */
+function openDetail(id) {
+  const l = leads.find(x=>x.id===id); if(!l) return;
+  document.getElementById('dp-name').textContent = l.naam;
+  document.getElementById('dp-company').textContent = l.bedrijf || l.niche || '';
+  document.getElementById('dp-status').innerHTML = statusPill(l.status);
+  document.getElementById('dp-deal-box').innerHTML = l.deal ? `
+    <div class="detail-deal-box">
+      <div class="detail-deal-label">Deal waarde</div>
+      <div class="detail-deal-value">${fmt(l.deal)}</div>
+    </div>` : '';
+  document.getElementById('dp-rows').innerHTML = [
+    ['Bron', `<span class="badge badge-gray">${l.bron||'—'}</span>`],
+    ['Niche', l.niche||'—'], ['Prioriteit', prioBadge(l.prio)],
+    ['Email', l.email?`<a href="mailto:${l.email}" style="color:var(--blue);">${l.email}</a>`:'—'],
+    ['Telefoon', l.tel||'—'], ['Dienst', l.dienst||'—'],
+    ['Gefactureerd', l.gefact?fmt(l.gefact):'—'],
+    ['Open bedrag', l.open?`<span style="color:var(--amber);">${fmt(l.open)}</span>`:'—'],
+    ['Volgende actie', fmtDate(l.actie)],
+  ].map(([k,v])=>`<div class="detail-row"><span class="detail-key">${k}</span><span class="detail-val">${v}</span></div>`).join('');
+  document.getElementById('dp-notes').innerHTML = l.notes ? `<div class="detail-notes">${l.notes}</div>` : '';
+  document.getElementById('dp-edit-btn').onclick = () => editLead(l.id);
+  document.getElementById('dp-delete-btn').onclick = () => deleteLead(l.id);
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+function closeDetail() { document.getElementById('detail-panel').classList.remove('open'); }
+
+/* ══════════════════════════════════
+   LEAD CRUD
+══════════════════════════════════ */
+function openLeadModal() {
+  editingId = null;
+  document.getElementById('lm-title').textContent = 'Nieuwe lead';
+  ['f-naam','f-bedrijf','f-email','f-tel','f-deal','f-gefact','f-open','f-website','f-notes'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('f-status').value = '🆕 Nieuw';
+  document.getElementById('f-bron').value = 'TikTok';
+  document.getElementById('f-niche').value = 'Personal Brand';
+  document.getElementById('f-prio').value = '🔥 Hoog';
+  document.getElementById('f-actie').value = '';
+  document.getElementById('f-dienst').value = 'CRM Systeem';
+  document.getElementById('lead-modal').classList.add('open');
+}
+
+function editLead(id) {
+  const l = leads.find(x=>x.id===id); if(!l) return;
+  editingId = id;
+  document.getElementById('lm-title').textContent = 'Lead bewerken';
+  const set = (id, v) => { const el=document.getElementById(id); if(el) el.value=v||''; };
+  set('f-naam',l.naam); set('f-bedrijf',l.bedrijf); set('f-email',l.email);
+  set('f-tel',l.tel); set('f-status',l.status); set('f-bron',l.bron);
+  set('f-niche',l.niche); set('f-prio',l.prio); set('f-deal',l.deal||'');
+  set('f-gefact',l.gefact||''); set('f-open',l.open||''); set('f-actie',l.actie);
+  set('f-dienst',l.dienst); set('f-website',l.website); set('f-notes',l.notes);
+  document.getElementById('lead-modal').classList.add('open');
+  closeDetail();
+}
+
+function closeLeadModal() { document.getElementById('lead-modal').classList.remove('open'); }
+
+function saveLead() {
+  const naam = document.getElementById('f-naam').value.trim();
+  if (!naam) { showToast('Vul een naam in'); return; }
+  const data = {
+    naam, bedrijf: document.getElementById('f-bedrijf').value,
+    email: document.getElementById('f-email').value, tel: document.getElementById('f-tel').value,
+    status: document.getElementById('f-status').value, bron: document.getElementById('f-bron').value,
+    niche: document.getElementById('f-niche').value, prio: document.getElementById('f-prio').value,
+    deal: parseFloat(document.getElementById('f-deal').value)||0,
+    gefact: parseFloat(document.getElementById('f-gefact').value)||0,
+    open: parseFloat(document.getElementById('f-open').value)||0,
+    actie: document.getElementById('f-actie').value,
+    dienst: document.getElementById('f-dienst').value, website: document.getElementById('f-website').value,
+    notes: document.getElementById('f-notes').value,
+  };
+  if (editingId) {
+    const i = leads.findIndex(l=>l.id===editingId);
+    leads[i] = {...leads[i], ...data};
+    addActivity('status', 'Lead bijgewerkt', `${data.naam} → ${data.status}`, 'Pipeline');
+    showToast('Lead bijgewerkt');
+  } else {
+    const newLead = { id: Date.now(), created: new Date().toISOString(), ...data };
+    leads.push(newLead);
+    addActivity('manual', 'Nieuwe lead toegevoegd', `${data.naam} handmatig toegevoegd`, 'Handmatig');
+    showToast('Lead toegevoegd');
+  }
+  saveLeads(); closeLeadModal(); renderAll();
+}
+
+function deleteLead(id) {
+  if (!confirm('Weet je zeker dat je deze lead wilt verwijderen?')) return;
+  leads = leads.filter(l=>l.id!==id);
+  saveLeads(); closeDetail(); renderAll(); showToast('Lead verwijderd');
+}
+
+/* ══════════════════════════════════
+   TAKEN CRUD
+══════════════════════════════════ */
+function openTaakModal() {
+  const sel = document.getElementById('t-lead');
+  sel.innerHTML = '<option value="">— Geen koppeling —</option>' + leads.map(l=>`<option value="${l.id}">${l.naam}</option>`).join('');
+  document.getElementById('taak-modal').classList.add('open');
+}
+
+function saveTaak() {
+  const taak = document.getElementById('t-taak').value.trim();
+  if (!taak) { showToast('Vul een taaknaam in'); return; }
+  taken.push({
+    id: Date.now(), taak,
+    leadId: document.getElementById('t-lead').value,
+    type: document.getElementById('t-type').value,
+    status: document.getElementById('t-status').value,
+    prio: document.getElementById('t-prio').value,
+    deadline: document.getElementById('t-deadline').value,
+    note: document.getElementById('t-note').value,
+  });
+  saveTaken2();
+  document.getElementById('taak-modal').classList.remove('open');
+  renderAll(); showToast('Taak aangemaakt');
+}
+
+/* ══════════════════════════════════
+   TEAM INVITE
+══════════════════════════════════ */
+function openInviteModal() { document.getElementById('invite-modal').classList.add('open'); }
+
+function sendInvite() {
+  const email = document.getElementById('inv-email').value.trim();
+  const name = document.getElementById('inv-name').value.trim();
+  if (!email || !name) { showToast('Vul naam en email in'); return; }
+  const colors = ['#7c3aed','#0891b2','#059669','#d97706','#dc2626'];
+  teamMembers.push({
+    id: 'u_' + Date.now(), name, email,
+    role: document.getElementById('inv-role').value,
+    avatar: name[0].toUpperCase(),
+    color: colors[teamMembers.length % colors.length],
+    pending: true
+  });
+  localStorage.setItem('cs-team', JSON.stringify(teamMembers));
+  document.getElementById('invite-modal').classList.remove('open');
+  renderTeam(); showToast(`Uitnodiging verstuurd naar ${email}`);
+}
+
+/* ══════════════════════════════════
+   ACTIVITY
+══════════════════════════════════ */
+function addActivity(type, title, body, tag) {
+  activity.unshift({ id: Date.now(), type, title, body, tag, time: new Date().toISOString() });
+  if (activity.length > 50) activity = activity.slice(0,50);
+  localStorage.setItem('cs-activity', JSON.stringify(activity));
+}
+
+function addDemoActivity() {
+  const demos = [
+    {type:'calendly', title:'Calendly afspraak geboekt', body:'Emma van Dijk boekte een gratis kennismakingsgesprek', tag:'Calendly'},
+    {type:'make', title:'Lead via Make.com', body:'Contact formulier inzending — Lucas B. (marketing bureau)', tag:'Make'},
+    {type:'webhook', title:'Webhook event ontvangen', body:'Nieuw lead via TikTok Bio link tracking', tag:'Webhook'},
+  ];
+  const d = demos[Math.floor(Math.random()*demos.length)];
+  addActivity(d.type, d.title, d.body, d.tag);
+  if (d.type === 'calendly' || d.type === 'make' || d.type === 'webhook') {
+    const autoLead = {
+      id: Date.now(), naam: d.body.split(' — ')[0].replace(/.*via |.*inzending — |.*—\s*/,'').split(' boekte')[0],
+      bedrijf: '', email: '', tel: '', status: '🆕 Nieuw', bron: d.tag,
+      niche: 'Anders', prio: '⚡ Middel', deal: 0, gefact: 0, open: 0,
+      actie: '', dienst: 'Anders', website: '', notes: 'Automatisch toegevoegd via ' + d.tag,
+      created: new Date().toISOString()
+    };
+    leads.push(autoLead); saveLeads();
+  }
+  renderAll(); showToast('Gesimuleerd: ' + d.title);
+}
+
+/* ══════════════════════════════════
+   INTEGRATIONS
+══════════════════════════════════ */
+let calendlyActive = false;
+function toggleCalendly() {
+  calendlyActive = !calendlyActive;
+  document.getElementById('calendly-dot').className = 'int-status-dot ' + (calendlyActive?'status-active':'status-inactive');
+  document.getElementById('calendly-status-label').textContent = calendlyActive ? 'Gekoppeld' : 'Niet gekoppeld';
+  document.getElementById('calendly-btn').textContent = calendlyActive ? 'Ontkoppelen' : 'Koppelen';
+  document.getElementById('calendly-config').style.display = calendlyActive ? '' : 'none';
+  showToast(calendlyActive ? 'Calendly gekoppeld' : 'Calendly ontkoppeld');
+}
+
+let makeGuideOpen = false;
+function showMakeGuide() {
+  makeGuideOpen = !makeGuideOpen;
+  document.getElementById('make-guide').style.display = makeGuideOpen ? '' : 'none';
+}
+
+function copyWebhook() {
+  copyText(document.getElementById('webhook-url').textContent);
+  showToast('Webhook URL gekopieerd');
+}
+
+function copyText(t) {
+  navigator.clipboard?.writeText(t).catch(()=>{});
+  showToast('Gekopieerd!');
+}
+
+function testWebhook() {
+  const naam = document.getElementById('test-naam').value;
+  const bron = document.getElementById('test-bron').value;
+  const note = document.getElementById('test-note').value;
+  if (!naam) { showToast('Vul een naam in'); return; }
+  const newLead = {
+    id: Date.now(), naam, bedrijf: '', email: document.getElementById('test-email').value,
+    tel: '', status: '🆕 Nieuw', bron, niche: 'Anders', prio: '⚡ Middel',
+    deal: 0, gefact: 0, open: 0, actie: '', dienst: 'Anders', website: '',
+    notes: note || `Ontvangen via ${bron} webhook`, created: new Date().toISOString()
+  };
+  leads.push(newLead); saveLeads();
+  addActivity('webhook', 'Webhook event ontvangen', `${naam} binnengekomen via ${bron}`, bron);
+  renderAll(); showToast('Test event verwerkt — lead aangemaakt!');
+}
+
+/* ══════════════════════════════════
+   SETTINGS
+══════════════════════════════════ */
+function saveSettings() {
+  const name = document.getElementById('set-name')?.value;
+  const email = document.getElementById('set-email')?.value;
+  const ws = document.getElementById('set-workspace')?.value;
+  if (currentUser) {
+    currentUser.name = name; currentUser.email = email; currentUser.workspace = ws;
+    localStorage.setItem('cs-user', JSON.stringify(currentUser));
+  }
+  loadUserInfo(); showToast('Instellingen opgeslagen');
+}
+
+function doLogout() {
+  localStorage.removeItem('cs-user');
+  window.location.href = 'login.html';
+}
+
+/* ══════════════════════════════════
+   TOAST
+══════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('app-toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+/* ══════════════════════════════════
+   MODAL CLOSE ON OVERLAY
+══════════════════════════════════ */
+['lead-modal','taak-modal','invite-modal'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+});
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+loadUserInfo();
+renderAll();
+</script>
+</body>
+</html>

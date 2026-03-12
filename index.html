@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="nl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CtrlSync CRM — Slimmer groeien</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ── LANDING SPECIFIC ── */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 60px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+  background: var(--bg);
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.logo-sq {
+  width: 28px; height: 28px;
+  background: var(--text);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-sq svg { width: 15px; height: 15px; }
+.logo-name { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+
+.nav-links { display: flex; align-items: center; gap: 6px; }
+@media (max-width: 640px) { .nav-links .hide-mobile { display: none; } }
+
+/* ── HERO ── */
+.hero {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 96px 40px 80px;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--green-bg);
+  color: var(--green);
+  border: 1px solid var(--green-border);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 28px;
+  letter-spacing: 0.03em;
+}
+.eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.hero-h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(40px, 6.5vw, 68px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+.hero-h1 em { font-style: italic; color: var(--text2); }
+
+.hero-sub {
+  font-size: clamp(16px, 2vw, 19px);
+  color: var(--text2);
+  font-weight: 300;
+  max-width: 500px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+
+.hero-ctas { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+.hero-note { font-size: 12px; color: var(--text3); margin-top: 16px; }
+
+/* ── FEATURES STRIP ── */
+.features-strip {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.feat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 400;
+}
+.feat-item svg { color: var(--green); flex-shrink: 0; }
+
+/* ── SCREENSHOT MOCKUP ── */
+.mockup-section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 60px 40px;
+}
+
+.mockup-frame {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.mockup-bar {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot-red { background: #ff5f57; }
+.dot-amber { background: #ffbd2e; }
+.dot-green { background: #28c840; }
+
+.mockup-url {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+}
+
+.mockup-inner { padding: 20px; }
+
+/* Mini dashboard inside mockup */
+.mini-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.mini-metric {
+  background: var(--bg3);
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+}
+.mini-m-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.mini-m-val { font-family: var(--font-serif); font-size: 22px; color: var(--text); }
+.mini-m-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+.mini-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mini-card { background: var(--bg3); border-radius: 10px; padding: 12px; border: 1px solid var(--border); }
+.mini-card-title { font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.mini-pipe-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 11px; color: var(--text2); }
+.mini-pipe-item:last-child { border: none; }
+.mini-bar { flex: 1; height: 4px; background: var(--bg4); border-radius: 99px; overflow: hidden; }
+.mini-bar-fill { height: 100%; border-radius: 99px; }
+
+@media (max-width: 640px) {
+  .mini-metrics { grid-template-columns: repeat(2, 1fr); }
+  .mini-row { grid-template-columns: 1fr; }
+}
+
+/* ── PRICING ── */
+.pricing-section { max-width: 1000px; margin: 0 auto; padding: 80px 40px; }
+
+.section-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.section-h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 400;
+  text-align: center;
+  letter-spacing: -0.02em;
+  margin-bottom: 48px;
+  color: var(--text);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+}
+
+.pricing-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+
+.pricing-card.popular {
+  background: var(--text);
+  border-color: transparent;
+  transform: scale(1.02);
+}
+
+.pricing-card.popular * { color: var(--bg) !important; }
+.pricing-card.popular .plan-feature { border-color: rgba(255,255,255,0.12) !important; }
+.pricing-card.popular .popular-tag { background: var(--bg); color: var(--text) !important; }
+
+.popular-tag {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--bg) !important;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 99px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.plan-tier { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 16px; }
+.plan-price { font-family: var(--font-serif); font-size: 46px; line-height: 1; letter-spacing: -0.03em; color: var(--text); margin-bottom: 4px; }
+.plan-price sup { font-size: 20px; vertical-align: top; margin-top: 8px; }
+.plan-price-period { font-size: 12px; color: var(--text3); margin-bottom: 6px; }
+.plan-desc { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
+
+.plan-features { margin-bottom: 22px; }
+.plan-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text2);
+}
+.plan-feature:last-child { border: none; }
+.plan-feature svg { flex-shrink: 0; margin-top: 1px; }
+
+/* ── INTEGRATIONS ── */
+.integrations-section { max-width: 900px; margin: 0 auto; padding: 60px 40px; }
+
+.integration-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.int-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+.int-chip:hover { border-color: var(--border2); color: var(--text); transform: translateY(-1px); }
+.int-chip-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-copy { font-size: 13px; color: var(--text3); }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { font-size: 13px; color: var(--text3); transition: color 0.15s; }
+.footer-links a:hover { color: var(--text2); }
+
+@media (max-width: 600px) {
+  .nav { padding: 0 20px; }
+  .hero { padding: 60px 20px 50px; }
+  .features-strip { padding: 16px 20px; gap: 20px; }
+  .mockup-section, .pricing-section, .integrations-section { padding-left: 20px; padding-right: 20px; }
+  footer { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-sq">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2.5">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <span class="logo-name">CtrlSync CRM</span>
+  </a>
+  <div class="nav-links">
+    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">
+      <svg id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <a href="login.html" class="btn btn-outline btn-sm hide-mobile">Inloggen</a>
+    <a href="register.html" class="btn btn-solid btn-sm">Probeer gratis</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <div class="eyebrow-dot"></div>
+    Nu beschikbaar — 14 dagen gratis proberen
+  </div>
+  <h1 class="hero-h1">Jouw leads. Jouw deals.<br><em>Volledig in controle.</em></h1>
+  <p class="hero-sub">De CRM die meegroeit met jouw agency. Leads bijhouden, deals sluiten, teams uitnodigen en alles automatiseren via Calendly, Make en meer.</p>
+  <div class="hero-ctas">
+    <a href="register.html" class="btn btn-solid btn-lg">Start gratis — geen creditcard</a>
+    <a href="#pricing" class="btn btn-outline btn-lg">Bekijk prijzen</a>
+  </div>
+  <p class="hero-note">Gratis 14 dagen · Daarna vanaf €29/maand · Opzeggen wanneer je wil</p>
+</section>
+
+<!-- FEATURES STRIP -->
+<div class="features-strip">
+  <div class="feat-item">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Pipeline & deals
+  </div>
+  <div class="feat-item">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Team uitnodigen
+  </div>
+  <div class="feat-item">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Calendly integratie
+  </div>
+  <div class="feat-item">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Make & Zapier webhooks
+  </div>
+  <div class="feat-item">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Mobiel &amp; desktop
+  </div>
+</div>
+
+<!-- MOCKUP -->
+<section class="mockup-section">
+  <div class="mockup-frame">
+    <div class="mockup-bar">
+      <div class="mockup-dot dot-red"></div>
+      <div class="mockup-dot dot-amber"></div>
+      <div class="mockup-dot dot-green"></div>
+      <div class="mockup-url">app.ctrlsync.nl/dashboard</div>
+    </div>
+    <div class="mockup-inner">
+      <div class="mini-metrics">
+        <div class="mini-metric">
+          <div class="mini-m-label">Pipeline</div>
+          <div class="mini-m-val">€12.400</div>
+          <div class="mini-m-sub">4 actieve deals</div>
+        </div>
+        <div class="mini-metric">
+          <div class="mini-m-label">Klanten</div>
+          <div class="mini-m-val">7</div>
+          <div class="mini-m-sub">+2 deze maand</div>
+        </div>
+        <div class="mini-metric">
+          <div class="mini-m-label">Conversie</div>
+          <div class="mini-m-val">38%</div>
+          <div class="mini-m-sub">Lead → klant</div>
+        </div>
+        <div class="mini-metric">
+          <div class="mini-m-label">Gefactureerd</div>
+          <div class="mini-m-val">€8.750</div>
+          <div class="mini-m-sub">Deze maand</div>
+        </div>
+      </div>
+      <div class="mini-row">
+        <div class="mini-card">
+          <div class="mini-card-title">Pipeline</div>
+          <div class="mini-pipe-item"><span style="min-width:80px;font-size:10px;">Nieuw</span><div class="mini-bar"><div class="mini-bar-fill" style="width:60%;background:#60a5fa;"></div></div><span>3</span></div>
+          <div class="mini-pipe-item"><span style="min-width:80px;font-size:10px;">Gesprek</span><div class="mini-bar"><div class="mini-bar-fill" style="width:40%;background:#fbbf24;"></div></div><span>2</span></div>
+          <div class="mini-pipe-item"><span style="min-width:80px;font-size:10px;">Voorstel</span><div class="mini-bar"><div class="mini-bar-fill" style="width:20%;background:#a78bfa;"></div></div><span>1</span></div>
+          <div class="mini-pipe-item"><span style="min-width:80px;font-size:10px;">Klant</span><div class="mini-bar"><div class="mini-bar-fill" style="width:80%;background:#4ade80;"></div></div><span>7</span></div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">Recente activiteit</div>
+          <div class="mini-pipe-item" style="flex-direction:column;align-items:flex-start;gap:2px;">
+            <span style="font-size:10px;color:var(--green);font-weight:600;">● Calendly afspraak</span>
+            <span style="font-size:11px;">Sarah M. — vandaag 14:00</span>
+          </div>
+          <div class="mini-pipe-item" style="flex-direction:column;align-items:flex-start;gap:2px;">
+            <span style="font-size:10px;color:var(--blue);font-weight:600;">● Nieuwe lead via Make</span>
+            <span style="font-size:11px;">Thomas B. — gisteren</span>
+          </div>
+          <div class="mini-pipe-item" style="flex-direction:column;align-items:flex-start;gap:2px;">
+            <span style="font-size:10px;color:var(--amber);font-weight:600;">● Status gewijzigd</span>
+            <span style="font-size:11px;">Anna K. → Voorstel verstuurd</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-eyebrow">Prijzen</div>
+  <h2 class="section-h2">Eerlijk en transparant</h2>
+
+  <div class="pricing-grid">
+    <!-- SOLO -->
+    <div class="pricing-card">
+      <div class="plan-tier">Solo</div>
+      <div class="plan-price"><sup>€</sup>29</div>
+      <div class="plan-price-period">per maand · jaarlijks €24/mo</div>
+      <p class="plan-desc">Alles wat je nodig hebt als freelancer of solopreneur.</p>
+      <div class="plan-features">
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>1 gebruiker</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkte leads & deals</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Pipeline & takenbeheer</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>3 webhook integraties</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Calendly koppeling</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span style="color:var(--text3)">Team leden</span></div>
+      </div>
+      <a href="register.html" class="btn btn-outline btn-full">Starten</a>
+    </div>
+
+    <!-- TEAM (POPULAR) -->
+    <div class="pricing-card popular">
+      <div class="popular-tag">Meest gekozen</div>
+      <div class="plan-tier">Team</div>
+      <div class="plan-price"><sup>€</sup>79</div>
+      <div class="plan-price-period">per maand · jaarlijks €66/mo</div>
+      <p class="plan-desc">Voor groeiende agencies die samenwerken en schalen.</p>
+      <div class="plan-features">
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Tot 5 teamleden</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Gedeelde data & pipeline</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkte webhooks</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Make, Zapier & n8n</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Activiteiten feed</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Team uitnodigen per email</div>
+      </div>
+      <a href="register.html?plan=team" class="btn btn-full" style="background:var(--bg);color:var(--text);">Start 14 dagen gratis</a>
+    </div>
+
+    <!-- AGENCY -->
+    <div class="pricing-card">
+      <div class="plan-tier">Agency</div>
+      <div class="plan-price"><sup>€</sup>199</div>
+      <div class="plan-price-period">per maand · jaarlijks €166/mo</div>
+      <p class="plan-desc">Schaalbaar voor grote teams met meerdere workspaces.</p>
+      <div class="plan-features">
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkte teamleden</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Meerdere workspaces</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Klant portals</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>White-label optie</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Prioriteit support</div>
+        <div class="plan-feature"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>API toegang</div>
+      </div>
+      <a href="register.html?plan=agency" class="btn btn-outline btn-full">Starten</a>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRATIONS -->
+<section class="integrations-section">
+  <div class="section-eyebrow">Integraties</div>
+  <h2 class="section-h2">Koppel alles wat je al gebruikt</h2>
+  <div class="integration-chips">
+    <div class="int-chip"><div class="int-chip-dot" style="background:#00c9b1;"></div>Calendly</div>
+    <div class="int-chip"><div class="int-chip-dot" style="background:#ff6d00;"></div>Make.com</div>
+    <div class="int-chip"><div class="int-chip-dot" style="background:#ff4a00;"></div>Zapier</div>
+    <div class="int-chip"><div class="int-chip-dot" style="background:#ef5350;"></div>n8n</div>
+    <div class="int-chip"><div class="int-chip-dot" style="background:#0e76a8;"></div>LinkedIn</div>
+    <div class="int-chip"><div class="int-chip-dot" style="background:#e1306c;"></div>Instagram</div>
+    <div class="int-chip"><div class="int-chip-dot" style="background:#000000;"></div>TikTok</div>
+    <div class="int-chip"><div class="int-chip-dot" style="background:#7289da;"></div>Webhook</div>
+    <div class="int-chip"><div class="int-chip-dot" style="background:#25d366;"></div>WhatsApp</div>
+    <div class="int-chip"><div class="int-chip-dot" style="background:#ea4335;"></div>Gmail</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2026 CtrlSync CRM · Gebouwd door CtrlSync</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Voorwaarden</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-icon-sun').style.display = isDark ? 'block' : 'none';
+  document.getElementById('theme-icon-moon').style.display = isDark ? 'none' : 'block';
+  localStorage.setItem('cs-theme', isDark ? 'light' : 'dark');
+}
+
+// Load saved theme
+const saved = localStorage.getItem('cs-theme') || 'dark';
+document.documentElement.setAttribute('data-theme', saved);
+document.getElementById('theme-icon-sun').style.display = saved === 'light' ? 'block' : 'none';
+document.getElementById('theme-icon-moon').style.display = saved === 'light' ? 'none' : 'block';
+</script>
+</body>
+</html>

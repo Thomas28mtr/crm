@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="nl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inloggen — CtrlSync CRM</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 768px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-panel { display: none; }
+}
+
+.auth-form-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  min-height: 100vh;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+.auth-logo-sq {
+  width: 32px; height: 32px;
+  background: var(--text);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.auth-logo-sq svg { width: 17px; height: 17px; }
+.auth-logo-name { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+
+.auth-title {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.auth-sub { font-size: 14px; color: var(--text2); margin-bottom: 28px; }
+
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+.auth-divider-line { flex: 1; height: 1px; background: var(--border); }
+.auth-divider-text { font-size: 12px; color: var(--text3); }
+
+.auth-footer-text {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 20px;
+}
+.auth-footer-text a { color: var(--text2); font-weight: 500; }
+.auth-footer-text a:hover { color: var(--text); }
+
+/* PANEL */
+.auth-panel {
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-panel::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, var(--violet-bg) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.panel-title {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin-bottom: 24px;
+}
+.panel-title em { font-style: italic; color: var(--text2); }
+
+.panel-testimonial {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-top: 32px;
+}
+.testimonial-text { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 14px; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 10px; }
+.testimonial-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--violet-bg), var(--blue-bg));
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: var(--violet);
+}
+.testimonial-name { font-size: 13px; font-weight: 600; }
+.testimonial-role { font-size: 12px; color: var(--text3); }
+
+/* THEME TOGGLE */
+.auth-theme-btn {
+  position: fixed;
+  top: 20px; right: 20px;
+}
+
+/* ERROR */
+.field-error { font-size: 12px; color: var(--red); margin-top: 4px; }
+.input-error { border-color: var(--red) !important; }
+
+/* PASSWORD STRENGTH */
+.pw-strength { margin-top: 6px; display: flex; gap: 4px; }
+.pw-bar { height: 3px; flex: 1; border-radius: 99px; background: var(--bg4); transition: background 0.3s; }
+.pw-bar.weak { background: var(--red); }
+.pw-bar.medium { background: var(--amber); }
+.pw-bar.strong { background: var(--green); }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle auth-theme-btn" onclick="toggleTheme()">
+  <svg id="ti-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+  <svg id="ti-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+</button>
+
+<!-- LOGIN PAGE -->
+<div id="page-login" class="auth-page">
+  <div class="auth-form-side">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-sq">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <span class="auth-logo-name">CtrlSync CRM</span>
+      </div>
+
+      <h1 class="auth-title">Welkom terug</h1>
+      <p class="auth-sub">Log in op je workspace</p>
+
+      <div class="auth-form">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="jij@bedrijf.nl" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label>Wachtwoord</label>
+          <input type="password" id="login-pw" placeholder="••••••••" autocomplete="current-password" />
+          <div style="text-align:right;margin-top:4px;"><a href="#" style="font-size:12px;color:var(--text3);">Wachtwoord vergeten?</a></div>
+        </div>
+        <button class="btn btn-solid btn-full" onclick="doLogin()" style="margin-top:4px;">
+          Inloggen
+        </button>
+      </div>
+
+      <div class="auth-footer-text">
+        Nog geen account? <a href="register.html">Registreer gratis</a>
+      </div>
+
+      <!-- Demo shortcut -->
+      <div style="margin-top:24px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);text-align:center;">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Demo account</div>
+        <button class="btn btn-ghost btn-sm btn-full" onclick="demoLogin()">Inloggen als Thomas (demo)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-panel">
+    <h2 class="panel-title">Alles wat je nodig hebt om<br><em>sneller te groeien.</em></h2>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+      <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Pipeline & dealflow op één plek
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Calendly afspraken automatisch als lead
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Teamleden uitnodigen & samenwerken
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Make, Zapier & n8n integraties
+      </div>
+    </div>
+
+    <div class="panel-testimonial">
+      <p class="testimonial-text">"Binnen een week had ik mijn hele leadproces geautomatiseerd. Elke Calendly-boeking komt direct als lead binnen — ik hoef niks meer handmatig in te voeren."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">T</div>
+        <div>
+          <div class="testimonial-name">Thomas — CtrlSync</div>
+          <div class="testimonial-role">Automation agency eigenaar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const saved = localStorage.getItem('cs-theme') || 'dark';
+document.documentElement.setAttribute('data-theme', saved);
+document.getElementById('ti-sun').style.display = saved === 'light' ? 'block' : 'none';
+document.getElementById('ti-moon').style.display = saved === 'light' ? 'none' : 'block';
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('ti-sun').style.display = isDark ? 'block' : 'none';
+  document.getElementById('ti-moon').style.display = isDark ? 'none' : 'block';
+  localStorage.setItem('cs-theme', isDark ? 'light' : 'dark');
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  if (!email || !pw) { showToastMsg('Vul alle velden in'); return; }
+  const users = JSON.parse(localStorage.getItem('cs-users') || '[]');
+  const user = users.find(u => u.email === email && u.password === pw);
+  if (!user) { showToastMsg('Onjuiste inloggegevens'); return; }
+  localStorage.setItem('cs-user', JSON.stringify(user));
+  window.location.href = 'app.html';
+}
+
+function demoLogin() {
+  const demo = { id: 'demo', name: 'Thomas', email: 'thomas@ctrlsync.nl', plan: 'team', workspace: 'CtrlSync', role: 'owner' };
+  localStorage.setItem('cs-user', JSON.stringify(demo));
+  window.location.href = 'app.html';
+}
+
+function showToastMsg(msg) {
+  let t = document.getElementById('global-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'global-toast'; t.className = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

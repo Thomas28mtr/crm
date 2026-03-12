@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="nl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account aanmaken — CtrlSync CRM</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px 20px; }
+
+.reg-nav {
+  width: 100%;
+  max-width: 920px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.reg-logo { display: flex; align-items: center; gap: 10px; }
+.reg-logo-sq {
+  width: 28px; height: 28px;
+  background: var(--text);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+}
+.reg-logo-sq svg { width: 15px; height: 15px; }
+.reg-logo-name { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+
+/* STEPS */
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 40px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+.step.active { color: var(--text); }
+.step.done { color: var(--green); }
+
+.step-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+  flex-shrink: 0;
+}
+.step.active .step-num { background: var(--text); color: var(--bg); border-color: transparent; }
+.step.done .step-num { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+
+.step-line { width: 40px; height: 1px; background: var(--border); margin: 0 8px; flex-shrink: 0; }
+@media (max-width: 480px) { .step-line { width: 20px; } .step span { display: none; } }
+
+/* FORM CARD */
+.reg-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 36px;
+  box-shadow: var(--shadow);
+}
+
+.reg-title {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+.reg-sub { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+
+/* PLAN SELECT */
+.plan-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+
+.plan-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.plan-option:hover { border-color: var(--border2); background: var(--bg3); }
+.plan-option.selected { border-color: var(--text); background: var(--bg3); }
+.plan-option input { position: absolute; opacity: 0; }
+
+.plan-opt-radio {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.plan-option.selected .plan-opt-radio { border-color: var(--text); background: var(--text); }
+.plan-option.selected .plan-opt-radio::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--bg); }
+
+.plan-opt-info { flex: 1; }
+.plan-opt-name { font-size: 14px; font-weight: 600; }
+.plan-opt-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.plan-opt-price { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; }
+
+.plan-badge-popular {
+  position: absolute;
+  top: -9px; right: 12px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 99px;
+  letter-spacing: 0.04em;
+}
+
+/* TEAM INVITE */
+.invite-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.invite-row input { flex: 1; }
+
+.invited-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.invited-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+.invited-remove { color: var(--text3); cursor: pointer; font-size: 16px; line-height: 1; padding: 0 4px; }
+.invited-remove:hover { color: var(--red); }
+
+/* PROGRESS BAR */
+.reg-progress {
+  width: 100%;
+  max-width: 520px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 99px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.reg-progress-fill {
+  height: 100%;
+  background: var(--text);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="reg-nav">
+  <a href="index.html" class="reg-logo">
+    <div class="reg-logo-sq">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2.5">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <span class="reg-logo-name">CtrlSync CRM</span>
+  </a>
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <svg id="ti-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+    <svg id="ti-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</div>
+
+<!-- STEPS -->
+<div class="steps">
+  <div class="step active" id="s1"><div class="step-num">1</div><span>Account</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s2"><div class="step-num">2</div><span>Abonnement</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s3"><div class="step-num">3</div><span>Team</span></div>
+  <div class="step-line"></div>
+  <div class="step" id="s4"><div class="step-num">4</div><span>Klaar</span></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="reg-progress">
+  <div class="reg-progress-fill" id="reg-progress" style="width:25%;"></div>
+</div>
+
+<!-- STEP 1: ACCOUNT -->
+<div class="reg-card" id="step-1">
+  <h2 class="reg-title">Account aanmaken</h2>
+  <p class="reg-sub">Start je gratis 14-daagse proefperiode</p>
+  <div class="auth-form" style="display:flex;flex-direction:column;gap:14px;">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Voornaam</label>
+        <input type="text" id="r-fname" placeholder="Thomas" autocomplete="given-name" />
+      </div>
+      <div class="form-group">
+        <label>Achternaam</label>
+        <input type="text" id="r-lname" placeholder="de Vries" autocomplete="family-name" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="r-email" placeholder="jij@bedrijf.nl" autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label>Wachtwoord</label>
+      <input type="password" id="r-pw" placeholder="Min. 8 tekens" oninput="checkPw(this.value)" />
+      <div class="pw-strength"><div class="pw-bar" id="pb1"></div><div class="pw-bar" id="pb2"></div><div class="pw-bar" id="pb3"></div></div>
+    </div>
+    <div class="form-group">
+      <label>Workspace naam</label>
+      <input type="text" id="r-workspace" placeholder="CtrlSync Agency" />
+    </div>
+    <button class="btn btn-solid btn-full" onclick="goStep2()" style="margin-top:4px;">Volgende stap →</button>
+  </div>
+  <div class="auth-footer-text" style="margin-top:16px;">Al een account? <a href="login.html">Inloggen</a></div>
+</div>
+
+<!-- STEP 2: PLAN -->
+<div class="reg-card" id="step-2" style="display:none;">
+  <h2 class="reg-title">Kies je abonnement</h2>
+  <p class="reg-sub">14 dagen gratis — daarna automatisch verlengd</p>
+  <div class="plan-options">
+    <label class="plan-option" onclick="selectPlan('solo', this)">
+      <input type="radio" name="plan" value="solo">
+      <div class="plan-opt-radio"></div>
+      <div class="plan-opt-info">
+        <div class="plan-opt-name">Solo</div>
+        <div class="plan-opt-desc">1 gebruiker · Alle basis features</div>
+      </div>
+      <div class="plan-opt-price">€29/mo</div>
+    </label>
+    <label class="plan-option selected" onclick="selectPlan('team', this)">
+      <div class="plan-badge-popular">Populair</div>
+      <input type="radio" name="plan" value="team" checked>
+      <div class="plan-opt-radio"></div>
+      <div class="plan-opt-info">
+        <div class="plan-opt-name">Team</div>
+        <div class="plan-opt-desc">Tot 5 leden · Webhooks · Samenwerken</div>
+      </div>
+      <div class="plan-opt-price">€79/mo</div>
+    </label>
+    <label class="plan-option" onclick="selectPlan('agency', this)">
+      <input type="radio" name="plan" value="agency">
+      <div class="plan-opt-radio"></div>
+      <div class="plan-opt-info">
+        <div class="plan-opt-name">Agency</div>
+        <div class="plan-opt-desc">Onbeperkt · White-label · API</div>
+      </div>
+      <div class="plan-opt-price">€199/mo</div>
+    </label>
+  </div>
+  <div style="margin-top:16px;padding:12px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius);font-size:13px;color:var(--green);display:flex;align-items:center;gap:8px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    14 dagen gratis — geen creditcard vereist
+  </div>
+  <div style="display:flex;gap:10px;margin-top:20px;">
+    <button class="btn btn-ghost" onclick="goStep(1)" style="flex:none;">← Terug</button>
+    <button class="btn btn-solid btn-full" onclick="goStep3()">Volgende stap →</button>
+  </div>
+</div>
+
+<!-- STEP 3: TEAM -->
+<div class="reg-card" id="step-3" style="display:none;">
+  <h2 class="reg-title">Teamleden uitnodigen</h2>
+  <p class="reg-sub">Sla over als je nu solo werkt — je kunt altijd later uitnodigen</p>
+  <div class="form-group" style="margin-bottom:12px;">
+    <label>Nodig uit via email</label>
+    <div class="invite-row">
+      <input type="email" id="invite-email" placeholder="collega@bedrijf.nl" onkeydown="if(event.key==='Enter')addInvite()" />
+      <button class="btn btn-ghost btn-sm" onclick="addInvite()" style="white-space:nowrap;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Toevoegen
+      </button>
+    </div>
+  </div>
+  <div class="invited-list" id="invited-list"></div>
+  <div style="display:flex;gap:10px;margin-top:24px;">
+    <button class="btn btn-ghost" onclick="goStep(2)" style="flex:none;">← Terug</button>
+    <button class="btn btn-solid btn-full" onclick="finishReg()">Account aanmaken</button>
+  </div>
+</div>
+
+<!-- STEP 4: SUCCESS -->
+<div class="reg-card" id="step-4" style="display:none;text-align:center;">
+  <div style="font-size:48px;margin-bottom:16px;">🎉</div>
+  <h2 class="reg-title">Welkom bij CtrlSync!</h2>
+  <p class="reg-sub" style="margin-bottom:24px;">Je account is aangemaakt. Je gratis proefperiode van 14 dagen is gestart.</p>
+  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:24px;text-align:left;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.07em;font-weight:600;">Jouw workspace</div>
+    <div id="confirm-workspace" style="font-size:15px;font-weight:600;margin-bottom:4px;"></div>
+    <div id="confirm-plan" style="font-size:13px;color:var(--text2);"></div>
+  </div>
+  <a href="app.html" class="btn btn-solid btn-full btn-lg">Naar mijn CRM →</a>
+</div>
+
+<div class="toast" id="global-toast"></div>
+
+<script>
+const saved = localStorage.getItem('cs-theme') || 'dark';
+document.documentElement.setAttribute('data-theme', saved);
+document.getElementById('ti-sun').style.display = saved === 'light' ? 'block' : 'none';
+document.getElementById('ti-moon').style.display = saved === 'light' ? 'none' : 'block';
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('ti-sun').style.display = isDark ? 'block' : 'none';
+  document.getElementById('ti-moon').style.display = isDark ? 'none' : 'block';
+  localStorage.setItem('cs-theme', isDark ? 'light' : 'dark');
+}
+
+let currentStep = 1;
+let selectedPlan = 'team';
+let invites = [];
+
+function goStep(n) {
+  document.getElementById('step-' + currentStep).style.display = 'none';
+  currentStep = n;
+  document.getElementById('step-' + currentStep).style.display = '';
+  document.getElementById('reg-progress').style.width = (n * 25) + '%';
+  ['s1','s2','s3','s4'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active', 'done');
+    if (i + 1 === n) el.classList.add('active');
+    if (i + 1 < n) el.classList.add('done');
+  });
+  window.scrollTo(0, 0);
+}
+
+function goStep2() {
+  const fname = document.getElementById('r-fname').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pw = document.getElementById('r-pw').value;
+  const ws = document.getElementById('r-workspace').value.trim();
+  if (!fname || !email || !pw || !ws) { showToast('Vul alle velden in'); return; }
+  if (pw.length < 8) { showToast('Wachtwoord moet minimaal 8 tekens zijn'); return; }
+  goStep(2);
+}
+
+function goStep3() { goStep(3); }
+
+function selectPlan(plan, el) {
+  selectedPlan = plan;
+  document.querySelectorAll('.plan-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// Auto-select plan from URL
+const urlPlan = new URLSearchParams(location.search).get('plan');
+if (urlPlan) {
+  document.querySelectorAll('.plan-option').forEach(el => {
+    const val = el.querySelector('input')?.value;
+    if (val === urlPlan) { el.classList.add('selected'); selectedPlan = urlPlan; }
+    else el.classList.remove('selected');
+  });
+}
+
+function addInvite() {
+  const input = document.getElementById('invite-email');
+  const email = input.value.trim();
+  if (!email || !email.includes('@')) { showToast('Vul een geldig emailadres in'); return; }
+  if (invites.includes(email)) { showToast('Al toegevoegd'); return; }
+  invites.push(email);
+  renderInvites();
+  input.value = '';
+}
+
+function removeInvite(email) {
+  invites = invites.filter(e => e !== email);
+  renderInvites();
+}
+
+function renderInvites() {
+  const el = document.getElementById('invited-list');
+  el.innerHTML = invites.map(e => `
+    <div class="invited-item">
+      <span style="font-size:13px;">${e}</span>
+      <span class="invited-remove" onclick="removeInvite('${e}')">×</span>
+    </div>
+  `).join('');
+}
+
+function finishReg() {
+  const fname = document.getElementById('r-fname').value.trim();
+  const lname = document.getElementById('r-lname').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pw = document.getElementById('r-pw').value;
+  const ws = document.getElementById('r-workspace').value.trim();
+
+  const user = {
+    id: 'u_' + Date.now(),
+    name: fname + (lname ? ' ' + lname : ''),
+    email, password: pw,
+    plan: selectedPlan,
+    workspace: ws,
+    role: 'owner',
+    invites,
+    created: new Date().toISOString()
+  };
+
+  const users = JSON.parse(localStorage.getItem('cs-users') || '[]');
+  users.push(user);
+  localStorage.setItem('cs-users', JSON.stringify(users));
+  localStorage.setItem('cs-user', JSON.stringify(user));
+
+  document.getElementById('confirm-workspace').textContent = ws;
+  const planNames = { solo: 'Solo — €29/maand', team: 'Team — €79/maand', agency: 'Agency — €199/maand' };
+  document.getElementById('confirm-plan').textContent = planNames[selectedPlan] + ' · 14 dagen gratis';
+
+  goStep(4);
+}
+
+function checkPw(v) {
+  const bars = [document.getElementById('pb1'), document.getElementById('pb2'), document.getElementById('pb3')];
+  bars.forEach(b => b.className = 'pw-bar');
+  if (v.length === 0) return;
+  if (v.length >= 4) bars[0].classList.add(v.length < 8 ? 'weak' : 'medium');
+  if (v.length >= 8) bars[1].classList.add('medium');
+  if (v.length >= 10 && /[A-Z]/.test(v) && /[0-9]/.test(v)) { bars[0].classList.add('strong'); bars[1].classList.add('strong'); bars[2].classList.add('strong'); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('global-toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
